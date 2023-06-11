@@ -87,9 +87,15 @@ let patternCity = document.querySelector("#city");
 patternCity.setAttribute("pattern", "[a-zA-Z-éèà]*");
 
 let patternEmail = document.querySelector("#email");
-patternEmail.setAttribute("pattern", "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+patternEmail.setAttribute(
+  "pattern",
+  "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+);
 
-// alerte quand les regex ne sont pas respecter 
+// alerte quand les regex ne sont pas respectées
+const showAlert = (errorMessage) => {
+  alert(`Attention: ${errorMessage}`);
+};
 
 
 //RECUPERER LES ID POUR ENVOIE A L'API
@@ -105,7 +111,10 @@ document
     for (let input of document.querySelectorAll(
       ".cart__order__form__question input"
     )) {
-      valid &= input.reportValidity();
+      if (!input.checkValidity()) {
+        valid = false;
+        showAlert(`Le champ "${input.name}" n'est pas valide.`);
+      }
       if (!valid) {
         break;
       }
