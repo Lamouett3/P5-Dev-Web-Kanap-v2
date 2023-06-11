@@ -75,13 +75,21 @@ if (productCart == null || productCart.length == 0) {
 //PATTERN POUR VALIDATION DE LETTRES UNIQUEMENT
 
 let patternFirstName = document.querySelector("#firstName");
-patternFirstName.setAttribute("pattern", "[a-zA-Z-éèà]*");
+patternFirstName.setAttribute("pattern", "^[A-Za-zÀ-ÿ\s-]+$");
 
 let patternLastName = document.querySelector("#lastName");
-patternLastName.setAttribute("pattern", "[a-zA-Z-éèà]*");
+patternLastName.setAttribute("pattern", "^[A-Za-zÀ-ÿ\s-]+$");
+
+let patternAddress = document.querySelector("#address");
+patternAddress.setAttribute("pattern", "^[A-Za-z0-9\s-]*$");
 
 let patternCity = document.querySelector("#city");
 patternCity.setAttribute("pattern", "[a-zA-Z-éèà]*");
+
+let patternEmail = document.querySelector("#email");
+patternEmail.setAttribute("pattern", "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+
+// alerte quand les regex ne sont pas respecter 
 
 
 //RECUPERER LES ID POUR ENVOIE A L'API
