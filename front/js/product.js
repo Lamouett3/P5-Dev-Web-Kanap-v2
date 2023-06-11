@@ -29,6 +29,9 @@ product.then((response) => {
   kanapData.then((data) => {
     //    console.log(data);
 
+// Creation du title
+    const productTitle = document.head;
+    document.title = data.name;
     // Création du contenaire image
 
     const productImage = document.createElement("img");
