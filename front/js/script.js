@@ -15,6 +15,7 @@ product.then((response) => {
       // Création des contenaires
       const productImage = document.createElement("img");
       productImage.src = data[i].imageUrl;
+      productImage.alt = data[i].altTxt;
       const productName = document.createElement("h3");
       productName.className = "productName";
       productName.innerText = data[i].name;

@@ -33,6 +33,7 @@ product.then((response) => {
 
     const productImage = document.createElement("img");
     productImage.src = data.imageUrl;
+    productImage.alt = data.altTxt;
     const containerImage = document.querySelector(".item__img");
     containerImage.appendChild(productImage);
     //    console.log(productImage);
