@@ -1,136 +1,117 @@
-// Récuperation de la chaîne de requete dans l'url
+// Récupération de la chaîne de requête dans l'URL
 const queryString_url_id = window.location.search;
-//console.log(queryString_url_id);
 
-/*   
- // methode  pour rextraire l'id avec slice
-const get_id = queryString_url_id.slice(1);
-console.log(get_id);         */
-
-// methode  pour re-extraire l'id (URLSearchParams)
+// Méthode pour extraire l'id (URLSearchParams)
 const get_id = new URLSearchParams(queryString_url_id);
-//console.log(get_id);
 const id = get_id.get("id");
-// console.log(id);
 
-//Récuperation d'un objet par sa key id
-
-// Méthode : avec fetch et en mettant la valeur de l'id a la fin de l'url
+// Récupération d'un objet par sa clé id avec fetch
 const product = fetch(`http://localhost:3000/api/products/${id}`);
-//console.log(product);
 
 // Affiche les données de l'id sous forme de tableau
 product.then((response) => {
-  //  console.log(response);
-  // retourne les données au format JSON
   const kanapData = response.json();
 
-  // puise dans le fichier json et retourne le tableau
   kanapData.then((data) => {
-    //    console.log(data);
-
-// Creation du title
+    // Création du titre
     const productTitle = document.head;
     document.title = data.name;
-    // Création du contenaire image
 
+    // Création du conteneur image
     const productImage = document.createElement("img");
     productImage.src = data.imageUrl;
     productImage.alt = data.altTxt;
     const containerImage = document.querySelector(".item__img");
     containerImage.appendChild(productImage);
-    //    console.log(productImage);
 
-    // Création du contenaire titre
+    // Création du conteneur titre
     const productName = document.createElement("h1");
     productName.innerText = data.name;
     const containerName = document.querySelector("#title");
     containerName.appendChild(productName);
-    // Création du contenaire prix
+
+    // Création du conteneur prix
     const productPrice = document.createElement("p");
     productPrice.innerText = data.price;
     const containerPrice = document.getElementById("price");
     containerPrice.appendChild(productPrice);
 
-    // Création du contenaire description
-
+    // Création du conteneur description
     const productDescription = document.createElement("p");
     productDescription.innerText = data.description;
     const containerDescription = document.getElementById("description");
     containerDescription.appendChild(productDescription);
 
-    //    console.log(productDescription);
-    // Création du menu déroulant
+    // Création du menu déroulant pour les couleurs
     let colorsSelector;
     Object.entries(data.colors).forEach((colors) => {
-      // console.log(colors);
       colorsSelector = document.createElement("option");
-      // création d'une boucle pour le menu déroulant couleur
       for (let i = 0; i < colors.length; i++) {
         colorsSelector.innerText = colors[i];
         const colorBloc = document.getElementById("colors");
         colorBloc.appendChild(colorsSelector);
-        // console.log(colorsSelector);
       }
-      // RESTE A CORRIGER LE L'AFFICHAGE DES DOUBLON DE COULEUR DANS LE MENU DEROULANT
     });
-    //------------------La gestion du panier--------
-    // la récuperation des données selectionné par l'utilisateur et  envoie le panier
-    //selection du bouton ajouter l'article au panier
+
+    // Gestion du panier
     const envoyerPanier = document.getElementById("addToCart");
-    //--addEventListener - Ecouter le bouton et envoyer le panier
     envoyerPanier.addEventListener("click", (event) => {
       event.preventDefault();
-      // mettre le choix de l'utilisateur dans une variable
-      const choixProduit = envoyerPanier.value;
 
-      //-------- Récuperation des valeur du formulaire
+      // Récupération des valeurs du formulaire
       let optionProduit = {
         id_Produit: data._id,
         nomProduit: data.name,
         imageProduit: data.imageUrl,
         altProduit: data.altTxt,
         prixProduit: data.price,
-        quantite_Produit: parseInt(document.getElementById("quantity").value), // recuperation des valeurs du menu deroulant pour le panier
-        couleur_Produit: document.getElementById("colors").value, // penser a rentrer une fonction pour inclure les quantité du menu déroulant
+        quantite_Produit: parseInt(document.getElementById("quantity").value),
+        couleur_Produit: document.getElementById("colors").value,
       };
 
-// Validation de la quantité
-if (optionProduit.quantite_Produit <= 0) {
-  alert("La quantité doit être supérieure à zéro !");
-  return;
-}
+      // Validation de la quantité
+      if (optionProduit.quantite_Produit <= 0) {
+        alert("La quantité doit être supérieure à zéro !");
+        return;
+      }
 
-if (optionProduit.quantite_Produit > 100) {
-  alert("La quantité maximale autorisée est de 100.");
-  return;
-}
-      //--------------------Stocker la recuperation des valeurs du formulaire dans le local storage
+      if (optionProduit.quantite_Produit > 100) {
+        alert("La quantité maximale autorisée est de 100.");
+        return;
+      }
 
-      let produitLocalStrorage = JSON.parse(localStorage.getItem("produitsPanier")
+      //-------------------- Stockage des valeurs du formulaire dans le localStorage
+
+      // Récupération des produits du localStorage
+      let produitLocalStorage = JSON.parse(localStorage.getItem("produitsPanier"));
+
+      // Vérifier si le produit existe déjà dans le panier en fonction de l'id et de la couleur
+      const foundIndex = produitLocalStorage.findIndex(
+        (element) =>
+          element.id_Produit == optionProduit.id_Produit &&
+          element.couleur_Produit == optionProduit.couleur_Produit
       );
 
-   // s'il y a deja des produits enregistrer dans le local storage
-      if (produitLocalStrorage === null) {
-        produitLocalStrorage = [];
-        produitLocalStrorage.push(optionProduit);
-        localStorage.setItem("produitsPanier", JSON.stringify(produitLocalStrorage)
-        );
+      if (foundIndex !== -1) {
+        // Si le produit existe déjà, mettre à jour la quantité
+        produitLocalStorage[foundIndex].quantite_Produit += optionProduit.quantite_Produit;
+      } else {
+        // Sinon, ajouter le produit au panier
+        produitLocalStorage.push(optionProduit);
       }
-      else {
-        const found = produitLocalStrorage.find(element => element.id_Produit == optionProduit.id_Produit && element.couleur_Produit == optionProduit.couleur_Produit);
-        
-        if (found == undefined) {
-            produitLocalStrorage.push(optionProduit);
-            localStorage.setItem("produitsPanier", JSON.stringify(produitLocalStrorage));
 
-//SI PRODUIT AVEC MEME ID ET COULEUR AUGMENTER LA QUANTITE
+      // Vérifier la quantité totale des produits dans le panier
+      const quantiteTotale = produitLocalStorage.reduce(
+        (total, produit) => total + produit.quantite_Produit,
+        0
+      );
 
-        } else {
-            found.quantite_Produit += optionProduit.quantite_Produit;
-            localStorage.setItem("produitsPanier", JSON.stringify(produitLocalStrorage));
-        }
-    }   
-});
-});
+      if (quantiteTotale > 100) {
+        alert("La quantité maximale autorisée est de 100 pour tous les produits.");
+        return;
+      }
+
+      localStorage.setItem("produitsPanier", JSON.stringify(produitLocalStorage));
+    });
+  });
 });
