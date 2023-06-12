@@ -70,7 +70,8 @@ let patternLastName = document.querySelector("#lastName");
 patternLastName.setAttribute("pattern", "^[A-Za-zÀ-ÿ\s-]+$");
 
 let patternAddress = document.querySelector("#address");
-patternAddress.setAttribute("pattern", "^[A-Za-z0-9\s-]+$");
+patternAddress.setAttribute("pattern", "^[A-Za-z0-9]+([\\s-][A-Za-z0-9]+)*$");
+
 
 let patternCity = document.querySelector("#city");
 patternCity.setAttribute("pattern", "[a-zA-Z-éèà]*");
