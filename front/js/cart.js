@@ -82,10 +82,45 @@ patternEmail.setAttribute(
 );
 
 // alerte quand les regex ne sont pas respectées
-const showAlert = (errorMessage) => {
-  alert(`Attention: ${errorMessage}`);
+const errorMessages = {
+  firstName: "Le champ Prénom n'est pas valide.",
+  lastName: "Le champ Nom n'est pas valide.",
+  address: "Le champ Adresse n'est pas valide.",
+  city: "Le champ Ville n'est pas valide.",
+  email: "Le champ Email n'est pas valide."
 };
 
+const showAlert = (inputId) => {
+  const errorMessage = errorMessages[inputId];
+  const errorElement = document.getElementById(`${inputId}ErrorMsg`);
+  errorElement.textContent = errorMessage;
+};
+
+const clearErrorMessage = (inputId) => {
+  const errorElement = document.getElementById(`${inputId}ErrorMsg`);
+  errorElement.textContent = "";
+};
+
+// Vérification de la regex après chaque saisie
+const validateInput = (input) => {
+  const inputId = input.id;
+  const regexPattern = input.getAttribute("pattern");
+  const regex = new RegExp(`^${regexPattern}$`);
+
+  if (!regex.test(input.value)) {
+    showAlert(inputId);
+  } else {
+    clearErrorMessage(inputId);
+  }
+};
+
+// Ajout des écouteurs d'événements "input" sur les champs de saisie
+const formInputs = document.querySelectorAll(".cart__order__form__question input");
+for (let input of formInputs) {
+  input.addEventListener("input", () => {
+    validateInput(input);
+  });
+}
 
 // RECUPERER LES ID POUR ENVOIE A L'API
 let getId = productCart.map((product) => product.id_Produit);
@@ -96,15 +131,10 @@ document
   .addEventListener("click", function (e) {
     e.preventDefault();
     let valid = true;
-    for (let input of document.querySelectorAll(
-      ".cart__order__form__question input"
-    )) {
+    for (let input of formInputs) {
+      validateInput(input);
       if (!input.checkValidity()) {
         valid = false;
-        showAlert(`Le champ "${input.name}" n'est pas valide.`);
-      }
-      if (!valid) {
-        break;
       }
     }
     if (valid) {
@@ -186,7 +216,7 @@ function deleteItem() {
       let canapeId = e.target.getAttribute("canapeId");
       let canapeColor = e.target.getAttribute("canapeColor");
       const searchDeleteItem = productCart.find(
-      (element) => element.id_Produit == canapeId && element.couleur_Produit == canapeColor
+        (element) => element.id_Produit == canapeId && element.couleur_Produit == canapeColor
       );
       productCart = productCart.filter((item) => item != searchDeleteItem);
       localStorage.setItem("produitsPanier", JSON.stringify(productCart));
