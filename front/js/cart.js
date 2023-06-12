@@ -81,7 +81,7 @@ patternEmail.setAttribute(
   "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
 );
 
-// alerte quand les regex ne sont pas respectées
+// ALERTE QUAND LES REGEX NE SONT PAS RESPECTÉES
 const errorMessages = {
   firstName: "Le champ Prénom n'est pas valide.",
   lastName: "Le champ Nom n'est pas valide.",
@@ -94,6 +94,7 @@ const showAlert = (inputId) => {
   const errorMessage = errorMessages[inputId];
   const errorElement = document.getElementById(`${inputId}ErrorMsg`);
   errorElement.textContent = errorMessage;
+  isFormValid = false; // Ajout de cette ligne pour invalider le formulaire
 };
 
 const clearErrorMessage = (inputId) => {
@@ -101,7 +102,7 @@ const clearErrorMessage = (inputId) => {
   errorElement.textContent = "";
 };
 
-// Vérification de la regex après chaque saisie
+// VÉRIFICATION DE LA REGEX APRÈS CHAQUE SAISIE
 const validateInput = (input) => {
   const inputId = input.id;
   const regexPattern = input.getAttribute("pattern");
@@ -112,9 +113,11 @@ const validateInput = (input) => {
   } else {
     clearErrorMessage(inputId);
   }
+
+  isFormValid = document.querySelectorAll(".cart__order__form__question input:invalid").length === 0;
 };
 
-// Ajout des écouteurs d'événements "input" sur les champs de saisie
+// AJOUT DES ÉCOUTEURS D'ÉVÉNEMENTS "input" SUR LES CHAMPS DE SAISIE
 const formInputs = document.querySelectorAll(".cart__order__form__question input");
 for (let input of formInputs) {
   input.addEventListener("input", () => {
@@ -122,55 +125,49 @@ for (let input of formInputs) {
   });
 }
 
-// RECUPERER LES ID POUR ENVOIE A L'API
+// RÉCUPÉRER LES ID POUR L'ENVOI À L'API
 let getId = productCart.map((product) => product.id_Produit);
 
-// VALIDATION DES CHAMPS UTILISATEURS ET ENVOI DES DONNEES A L'API
-document
-  .querySelector(".cart__order__form__submit")
-  .addEventListener("click", function (e) {
-    e.preventDefault();
-    let valid = true;
-    for (let input of formInputs) {
-      validateInput(input);
-      if (!input.checkValidity()) {
-        valid = false;
-      }
-    }
-    if (valid) {
-      const result = fetch("http://localhost:3000/api/products/order", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contact: {
-            firstName: document.getElementById("firstName").value,
-            lastName: document.getElementById("lastName").value,
-            address: document.getElementById("address").value,
-            city: document.getElementById("city").value,
-            email: document.getElementById("email").value,
-          },
-          products: getId,
-        }),
-      });
-      result.then(async (answer) => {
-        try {
-          const data = await answer.json();
-          window.location.href = `confirmation.html?id=${data.orderId}`;
-          localStorage.clear();
-        } catch (e) {}
-      });
-    }
-  });
+// VALIDATION DES CHAMPS UTILISATEURS ET ENVOI DES DONNÉES À L'API
+document.querySelector(".cart__order__form__submit").addEventListener("click", function (e) {
+  e.preventDefault();
 
-/* MODIFICATION DE LA QUANTITE AVEC L'INPUT
+  if (isFormValid) {
+    const result = fetch("http://localhost:3000/api/products/order", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        contact: {
+          firstName: document.getElementById("firstName").value,
+          lastName: document.getElementById("lastName").value,
+          address: document.getElementById("address").value,
+          city: document.getElementById("city").value,
+          email: document.getElementById("email").value,
+        },
+        products: getId,
+      }),
+    });
+    result.then(async (answer) => {
+      try {
+        const data = await answer.json();
+        window.location.href = `confirmation.html?id=${data.orderId}`;
+        localStorage.clear();
+      } catch (e) {}
+    });
+  } else {
+    alert("Veuillez corriger les erreurs du formulaire avant de passer la commande.");
+  }
+});
+
+/* MODIFICATION DE LA QUANTITÉ AVEC L'INPUT
  *Crée un tableau d'input
  *Cherche l'ID et la couleur du produit présent dans la classe .itemQuantity et le compare au produit présent dans productCart
  *Crée une nouvelle fiche produit avec la quantité mise à jour
  *Met à jour ce produit dans productInLocalStorage
- *Enregistre productCart dans le localStorage et rafraichit la page
+ *Enregistre productCart dans le localStorage et rafraîchit la page
  */
 function modifyQuantity() {
   let inputs = document.querySelectorAll('.itemQuantity');
@@ -198,17 +195,16 @@ function modifyQuantity() {
   }
 }
 
-// MODIFICATION DE LA QUANTITE A L'OUVERTURE DE LA PAGE
+// MODIFICATION DE LA QUANTITÉ À L'OUVERTURE DE LA PAGE
 modifyQuantity();
 
 
-/*SELECTION DE L'ELEMENT A SUPPRIMER DANS LE TABLEAU PRODUCTINLOCALSTORAGE
+/* SÉLECTION DE L'ÉLÉMENT À SUPPRIMER DANS LE TABLEAU PRODUCTINLOCALSTORAGE
  *Crée un tableau de boutons
  *Cherche l'ID et la couleur du produit présent dans la classe .deleteItem et le compare au produit présent dans productCart
  *Filtre le produit trouvé et le supprime du tableau productCart
- *Enregistre productCart dans le localStorage et rafraichit la page
+ *Enregistre productCart dans le localStorage et rafraîchit la page
  */
-
 function deleteItem() {
   let buttons = document.querySelectorAll(".deleteItem");
   for (let button of Array.from(buttons)) {
