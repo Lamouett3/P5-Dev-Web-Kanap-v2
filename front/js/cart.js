@@ -1,67 +1,58 @@
-//AFFICHAGE DES PRODUITS DU PANIER
+// AFFICHAGE DES PRODUITS DU PANIER
 let productCart = JSON.parse(localStorage.getItem("produitsPanier"));
 
-//GESTION DU PANIER VIDE ET PLEIN
-
+// GESTION DU PANIER VIDE ET PLEIN
 if (productCart == null || productCart.length == 0) {
   document.querySelector("h1").innerHTML += ` est vide`;
 } else {
   document.querySelector("h1").innerHTML += ``;
 
-  //CREATION DES VARIABLES TABLEAUX QUI VONT CONTENIR LES QUANTITES ET PRIX DES PRODUITS
-
+  // CREATION DES VARIABLES TABLEAUX QUI VONT CONTENIR LES QUANTITES ET PRIX DES PRODUITS
   let totalPrice = [];
   let totalQuantity = [];
 
-  //EXTRACTION DU LOCAL STORAGE POUR CREATION DE LA FICHE PRODUIT DANS LE PANIER
-
-  for (i = 0; i < productCart.length; i += 1) { 
-    document.querySelector("#cart__items").innerHTML += 
-    `<article class="cart__item" data-id="${productCart[i].id_Produit}">
-        <div class="cart__item__img">
-          <img src="${productCart[i].imageProduit}" alt="${productCart[i].altProduit}">
-        </div>
-        <div class="cart__item__content">
-          <div class="cart__item__content__titlePrice">
-            <h2>${productCart[i].nomProduit}</h2>
-            <p>${productCart[i].prixProduit * productCart[i].quantite_Produit} €</p>
+  // EXTRACTION DU LOCAL STORAGE POUR CREATION DE LA FICHE PRODUIT DANS LE PANIER
+  for (let i = 0; i < productCart.length; i += 1) {
+    document.querySelector("#cart__items").innerHTML +=
+      `<article class="cart__item" data-id="${productCart[i].id_Produit}">
+          <div class="cart__item__img">
+            <img src="${productCart[i].imageProduit}" alt="${productCart[i].altProduit}">
           </div>
-          <div class="cart__item__content__settings">
-            <div class="cart__item__content__settings__quantity">
-              <p>Couleur : ${productCart[i].couleur_Produit}</p>
-              <p>Qté : </p>
-              <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" canapeId="${productCart[i].id_Produit}" canapeColor="${productCart[i].couleur_Produit}" value="${productCart[i].quantite_Produit}">
+          <div class="cart__item__content">
+            <div class="cart__item__content__titlePrice">
+              <h2>${productCart[i].nomProduit}</h2>
+              <p>${productCart[i].prixProduit * productCart[i].quantite_Produit} €</p>
             </div>
-          <div class="cart__item__content__settings__delete">
-            <p class="deleteItem" canapeId="${productCart[i].id_Produit}" canapeColor="${productCart[i].couleur_Produit}">Supprimer</p>
+            <div class="cart__item__content__settings">
+              <div class="cart__item__content__settings__quantity">
+                <p>Couleur : ${productCart[i].couleur_Produit}</p>
+                <p>Qté : </p>
+                <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" canapeId="${productCart[i].id_Produit}" canapeColor="${productCart[i].couleur_Produit}" value="${productCart[i].quantite_Produit}">
+              </div>
+            <div class="cart__item__content__settings__delete">
+              <p class="deleteItem" canapeId="${productCart[i].id_Produit}" canapeColor="${productCart[i].couleur_Produit}">Supprimer</p>
+            </div>
           </div>
-        </div>
-    </div>
-    </article>`;
-// data-id="{product-ID}"
-// data-color="{product-color}"
+      </div>
+      </article>`;
 
-    //TOTAL PANIER
-    //VARIABLES POUR CHANGER LE TYPE EN NOMBRE
-
+    // TOTAL PANIER
+    // VARIABLES POUR CHANGER LE TYPE EN NOMBRE
     let quantityNumber = parseInt(productCart[i].quantite_Produit);
     let priceNumber = parseInt(
       productCart[i].prixProduit * productCart[i].quantite_Produit
     );
 
-    //PUSH DES NOMBRES DANS LES VARIABLES TABLEAUX
-
+    // PUSH DES NOMBRES DANS LES VARIABLES TABLEAUX
     totalQuantity.push(quantityNumber);
     totalPrice.push(priceNumber);
   }
 
-  //ADDITION DES QUANTITES DES PRODUITS
-
+  // ADDITION DES QUANTITES DES PRODUITS
   const reducer = (accumulator, currentValue) => accumulator + currentValue;
   const totalQuantityResult = totalQuantity.reduce(reducer, 0);
 
-  //ADDITION DES PRIX DES PRODUITS
-
+  // ADDITION DES PRIX DES PRODUITS
   const totalPriceResult = totalPrice.reduce(reducer, 0);
 
   document.querySelector(
@@ -70,10 +61,8 @@ if (productCart == null || productCart.length == 0) {
   document.querySelector("#totalPrice").innerHTML += `${totalPriceResult}`;
 }
 
-//GERER LES INTERACTIONS AVEC LE FORMULAIRE A REMPLIR
-
-//PATTERN POUR VALIDATION DE LETTRES UNIQUEMENT
-
+// GERER LES INTERACTIONS AVEC LE FORMULAIRE A REMPLIR
+// PATTERN POUR VALIDATION DE LETTRES UNIQUEMENT
 let patternFirstName = document.querySelector("#firstName");
 patternFirstName.setAttribute("pattern", "^[A-Za-zÀ-ÿ\s-]+$");
 
@@ -98,11 +87,10 @@ const showAlert = (errorMessage) => {
 };
 
 
-//RECUPERER LES ID POUR ENVOIE A L'API
+// RECUPERER LES ID POUR ENVOIE A L'API
 let getId = productCart.map((product) => product.id_Produit);
 
-//VALIDATION DES CHAMPS UTILISATEURS ET ENVOI DES DONNEES A L'API
-
+// VALIDATION DES CHAMPS UTILISATEURS ET ENVOI DES DONNEES A L'API
 document
   .querySelector(".cart__order__form__submit")
   .addEventListener("click", function (e) {
@@ -147,14 +135,13 @@ document
     }
   });
 
-/*MODIFICATION DE LA QUANTITE AVEC L'INPUT
+/* MODIFICATION DE LA QUANTITE AVEC L'INPUT
  *Crée un tableau d'input
  *Cherche l'ID et la couleur du produit présent dans la classe .itemQuantity et le compare au produit présent dans productCart
  *Crée une nouvelle fiche produit avec la quantité mise à jour
  *Met à jour ce produit dans productInLocalStorage
  *Enregistre productCart dans le localStorage et rafraichit la page
  */
-
 function modifyQuantity() {
   let inputs = document.querySelectorAll('.itemQuantity');
   for (let input of Array.from(inputs)) {
@@ -163,16 +150,27 @@ function modifyQuantity() {
       let canapeColor = event.target.getAttribute("canapeColor");
       const modify = productCart.find(
         (element) => element.id_Produit == canapeId && element.couleur_Produit == canapeColor
-        );
-      modify.quantite_Produit = input.value;
-      productCart = productCart.filter(item => item = modify);
-      localStorage.setItem("produitsPanier", JSON.stringify(productCart));
-      window.location.href = "cart.html";
+      );
+
+      // Validation de la quantité
+      if (input.value > 100) {
+        alert("La quantité doit être inférieure ou égale à 100 !");
+        input.value = modify.quantite_Produit; // Réinitialiser à la quantité précédente
+      } else if (input.value < 1) {
+        alert("La quantité doit être supérieure ou égale à 1 !");
+        input.value = modify.quantite_Produit; // Réinitialiser à la quantité précédente
+      } else {
+        modify.quantite_Produit = input.value;
+        localStorage.setItem("produitsPanier", JSON.stringify(productCart));
+        location.reload();
+      }
     });
   }
 }
 
+// MODIFICATION DE LA QUANTITE A L'OUVERTURE DE LA PAGE
 modifyQuantity();
+
 
 /*SELECTION DE L'ELEMENT A SUPPRIMER DANS LE TABLEAU PRODUCTINLOCALSTORAGE
  *Crée un tableau de boutons
