@@ -64,17 +64,16 @@ if (productCart == null || productCart.length == 0) {
 // GERER LES INTERACTIONS AVEC LE FORMULAIRE A REMPLIR
 // PATTERN POUR VALIDATION DE LETTRES UNIQUEMENT
 let patternFirstName = document.querySelector("#firstName");
-patternFirstName.setAttribute("pattern", "^[A-Za-zÀ-ÿ\s-]+$");
+patternFirstName.setAttribute("pattern", "^[A-Za-zÀ-ÿ\\s-]+$");
 
 let patternLastName = document.querySelector("#lastName");
-patternLastName.setAttribute("pattern", "^[A-Za-zÀ-ÿ\s-]+$");
+patternLastName.setAttribute("pattern", "^[A-Za-zÀ-ÿ\\s-]+$");
 
 let patternAddress = document.querySelector("#address");
 patternAddress.setAttribute("pattern", "^[A-Za-z0-9]+([\\s-][A-Za-z0-9]+)*$");
 
-
 let patternCity = document.querySelector("#city");
-patternCity.setAttribute("pattern", "[a-zA-Z-éèà]*");
+patternCity.setAttribute("pattern", "^[A-Za-zÀ-ÿ-]+$");
 
 let patternEmail = document.querySelector("#email");
 patternEmail.setAttribute(
@@ -115,7 +114,7 @@ const validateInput = (input) => {
     clearErrorMessage(inputId);
   }
 
-  isFormValid = document.querySelectorAll(".cart__order__form__question input:invalid").length === 0;
+  isFormValid = validateFormInputs(); // Validation du formulaire complet
 };
 
 // AJOUT DES ÉCOUTEURS D'ÉVÉNEMENTS "input" SUR LES CHAMPS DE SAISIE
@@ -133,35 +132,62 @@ let getId = productCart.map((product) => product.id_Produit);
 document.querySelector(".cart__order__form__submit").addEventListener("click", function (e) {
   e.preventDefault();
 
-  if (isFormValid) {
-    const result = fetch("http://localhost:3000/api/products/order", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        contact: {
-          firstName: document.getElementById("firstName").value,
-          lastName: document.getElementById("lastName").value,
-          address: document.getElementById("address").value,
-          city: document.getElementById("city").value,
-          email: document.getElementById("email").value,
-        },
-        products: getId,
-      }),
-    });
-    result.then(async (answer) => {
-      try {
-        const data = await answer.json();
-        window.location.href = `confirmation.html?id=${data.orderId}`;
-        localStorage.clear();
-      } catch (e) {}
-    });
-  } else {
+  const invalidInputs = document.querySelectorAll(".cart__order__form__question input:invalid");
+  if (invalidInputs.length > 0) {
     alert("Veuillez corriger les erreurs du formulaire avant de passer la commande.");
+    return;
   }
+
+  const isFormValid = validateFormInputs();
+  if (!isFormValid) {
+    alert("Veuillez corriger les erreurs du formulaire avant de passer la commande.");
+    return;
+  }
+
+  const result = fetch("http://localhost:3000/api/products/order", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      contact: {
+        firstName: document.getElementById("firstName").value,
+        lastName: document.getElementById("lastName").value,
+        address: document.getElementById("address").value,
+        city: document.getElementById("city").value,
+        email: document.getElementById("email").value,
+      },
+      products: getId,
+    }),
+  });
+
+  result.then(async (answer) => {
+    try {
+      const data = await answer.json();
+      window.location.href = `confirmation.html?id=${data.orderId}`;
+      localStorage.clear();
+    } catch (e) {}
+  });
 });
+
+// FONCTION POUR VALIDER LES CHAMPS DU FORMULAIRE
+const validateFormInputs = () => {
+  const formInputs = document.querySelectorAll(".cart__order__form__question input");
+  let isFormValid = true;
+
+  for (let input of formInputs) {
+    const regexPattern = input.getAttribute("pattern");
+    const regex = new RegExp(`^${regexPattern}$`);
+
+    if (!regex.test(input.value)) {
+      isFormValid = false;
+      break;
+    }
+  }
+
+  return isFormValid;
+};
 
 /* MODIFICATION DE LA QUANTITÉ AVEC L'INPUT
  *Crée un tableau d'input
