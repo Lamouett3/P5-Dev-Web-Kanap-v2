@@ -66,7 +66,7 @@ const product = fetch(`http://localhost:3000/api/products/${id}`)
                     nomProduit: data.name,
                     imageProduit: data.imageUrl,
                     altProduit: data.altTxt,
-                    prixProduit: data.price,
+             //     prixProduit: data.price,
                     quantite_Produit: parseInt(document.getElementById("quantity").value), 
                     couleur_Produit: document.getElementById("colors").value,
                 };

@@ -13,39 +13,46 @@ if (productCart == null || productCart.length == 0) {
 
   // EXTRACTION DU LOCAL STORAGE POUR CREATION DE LA FICHE PRODUIT DANS LE PANIER
   for (let i = 0; i < productCart.length; i += 1) {
-    document.querySelector("#cart__items").innerHTML +=
-      `<article class="cart__item" data-id="${productCart[i].id_Produit}">
-          <div class="cart__item__img">
-            <img src="${productCart[i].imageProduit}" alt="${productCart[i].altProduit}">
-          </div>
-          <div class="cart__item__content">
-            <div class="cart__item__content__titlePrice">
-              <h2>${productCart[i].nomProduit}</h2>
-              <p>${productCart[i].prixProduit * productCart[i].quantite_Produit} €</p>
+    // Récupérer le prix à partir de l'API
+    fetch(`http://localhost:3000/api/products/${productCart[i].id_Produit}`)
+      .then(response => response.json())
+      .then(data => {
+        const prixProduit = data.price;
+        const prixTotal = prixProduit * productCart[i].quantite_Produit;
+
+        document.querySelector("#cart__items").innerHTML +=
+          `<article class="cart__item" data-id="${productCart[i].id_Produit}">
+            <div class="cart__item__img">
+              <img src="${productCart[i].imageProduit}" alt="${productCart[i].altProduit}">
             </div>
-            <div class="cart__item__content__settings">
-              <div class="cart__item__content__settings__quantity">
-                <p>Couleur : ${productCart[i].couleur_Produit}</p>
-                <p>Qté : </p>
-                <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" canapeId="${productCart[i].id_Produit}" canapeColor="${productCart[i].couleur_Produit}" value="${productCart[i].quantite_Produit}">
+            <div class="cart__item__content">
+              <div class="cart__item__content__titlePrice">
+                <h2>${productCart[i].nomProduit}</h2>
+                <p>${prixTotal} €</p>
               </div>
-            <div class="cart__item__content__settings__delete">
-              <p class="deleteItem" canapeId="${productCart[i].id_Produit}" canapeColor="${productCart[i].couleur_Produit}">Supprimer</p>
+              <div class="cart__item__content__settings">
+                <div class="cart__item__content__settings__quantity">
+                  <p>Couleur : ${productCart[i].couleur_Produit}</p>
+                  <p>Qté : </p>
+                  <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" canapeId="${productCart[i].id_Produit}" canapeColor="${productCart[i].couleur_Produit}" value="${productCart[i].quantite_Produit}">
+                </div>
+              <div class="cart__item__content__settings__delete">
+                <p class="deleteItem" canapeId="${productCart[i].id_Produit}" canapeColor="${productCart[i].couleur_Produit}">Supprimer</p>
+              </div>
             </div>
           </div>
-      </div>
-      </article>`;
+        </article>`;
 
-    // TOTAL PANIER
-    // VARIABLES POUR CHANGER LE TYPE EN NOMBRE
-    let quantityNumber = parseInt(productCart[i].quantite_Produit);
-    let priceNumber = parseInt(
-      productCart[i].prixProduit * productCart[i].quantite_Produit
-    );
+        // TOTAL PANIER
+        // VARIABLES POUR CHANGER LE TYPE EN NOMBRE
+        let quantityNumber = parseInt(productCart[i].quantite_Produit);
+        let priceNumber = parseInt(prixTotal);
 
-    // PUSH DES NOMBRES DANS LES VARIABLES TABLEAUX
-    totalQuantity.push(quantityNumber);
-    totalPrice.push(priceNumber);
+        // PUSH DES NOMBRES DANS LES VARIABLES TABLEAUX
+        totalQuantity.push(quantityNumber);
+        totalPrice.push(priceNumber);
+      })
+      .catch(error => console.log(error));
   }
 
   // ADDITION DES QUANTITES DES PRODUITS
@@ -60,6 +67,7 @@ if (productCart == null || productCart.length == 0) {
   ).innerHTML += `${totalQuantityResult}`;
   document.querySelector("#totalPrice").innerHTML += `${totalPriceResult}`;
 }
+
 
 // GERER LES INTERACTIONS AVEC LE FORMULAIRE A REMPLIR
 // PATTERN POUR VALIDATION DE LETTRES UNIQUEMENT
