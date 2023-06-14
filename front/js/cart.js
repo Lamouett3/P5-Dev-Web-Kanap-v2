@@ -52,23 +52,18 @@ if (productCart.length == 0) {
         // PUSH DES NOMBRES DANS LES VARIABLES TABLEAUX
         totalQuantity.push(quantityNumber);
         totalPrice.push(priceNumber);
+
+        // Mettre à jour le total des quantités et des prix
+        const totalQuantityResult = totalQuantity.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+        const totalPriceResult = totalPrice.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+
+        // Afficher les valeurs dans la section cart__price
+        document.querySelector("#totalQuantity").innerHTML = totalQuantityResult;
+        document.querySelector("#totalPrice").innerHTML = totalPriceResult;
       })
       .catch(error => console.log(error));
   }
-
-  // ADDITION DES QUANTITES DES PRODUITS
-  const reducer = (accumulator, currentValue) => accumulator + currentValue;
-  const totalQuantityResult = totalQuantity.reduce(reducer, 0);
-
-  // ADDITION DES PRIX DES PRODUITS
-  const totalPriceResult = totalPrice.reduce(reducer, 0);
-
-  document.querySelector(
-    "#totalQuantity"
-  ).innerHTML += `${totalQuantityResult}`;
-  document.querySelector("#totalPrice").innerHTML += `${totalPriceResult}`;
 }
-
 
 // GERER LES INTERACTIONS AVEC LE FORMULAIRE A REMPLIR
 let patternFirstName = document.querySelector("#firstName");
