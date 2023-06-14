@@ -189,8 +189,10 @@ document.addEventListener('change', function (e) {
     let newQuantity = parseInt(e.target.value);
 
     // Vérifier si la nouvelle quantité est en dehors de la plage autorisée
-    if (newQuantity < 0 || newQuantity > 100) {
-      alert("La quantité doit être comprise entre 0 et 100.");
+    if (newQuantity < 1 || newQuantity > 100) {
+      alert("La quantité doit être comprise entre 1 et 100.");
+      // Recharger la page pour remettre la valeur précédente
+      location.reload();
       return;
     }
 
@@ -199,6 +201,16 @@ document.addEventListener('change', function (e) {
         // Vérifier si la nouvelle quantité dépasse le maximum autorisé
         if (newQuantity > 100) {
           alert("La quantité maximale autorisée est de 100.");
+          // Recharger la page pour remettre la valeur précédente
+          location.reload();
+          return;
+        }
+
+        // Vérifier si la nouvelle quantité est 0
+        if (newQuantity === 0) {
+          alert("La quantité minimale autorisée est de 1.");
+          // Recharger la page pour remettre la valeur précédente
+          location.reload();
           return;
         }
 
