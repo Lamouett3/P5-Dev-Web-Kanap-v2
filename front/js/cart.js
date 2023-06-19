@@ -2,8 +2,11 @@
 let productCart = JSON.parse(localStorage.getItem("produitsPanier")) || [];
 let getId = productCart.map((product) => product.id_Produit);
 
+// Vérification du panier vide
+let isCartEmpty = productCart.length == 0;
+
 // AFFICHAGE DES PRODUITS DU PANIER
-if (productCart.length == 0) {
+if (isCartEmpty) {
   document.querySelector("h1").innerHTML += ` est vide`;
 } else {
   document.querySelector("h1").innerHTML += ``;
@@ -141,6 +144,11 @@ const isFormValid = () => {
 
 document.querySelector(".cart__order__form__submit").addEventListener("click", function (e) {
   e.preventDefault();
+
+  if (isCartEmpty) {
+    alert("Le panier est vide. Veuillez ajouter des produits avant de passer une commande.");
+    return;
+  }
 
   if (!isFormValid()) {
     alert("Veuillez corriger les erreurs du formulaire avant de passer la commande.");
