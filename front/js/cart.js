@@ -147,7 +147,7 @@ document.querySelector(".cart__order__form__submit").addEventListener("click", f
     return;
   }
 
-  const result = fetch("http://localhost:3000/api/products/order", {
+  fetch("http://localhost:3000/api/products/order", {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -163,17 +163,13 @@ document.querySelector(".cart__order__form__submit").addEventListener("click", f
       },
       products: getId,
     }),
-  });
-
-  result.then(async (answer) => {
-    try {
-      const data = await answer.json();
-      window.location.href = `confirmation.html?id=${data.orderId}`;
-      localStorage.removeItem("produitsPanier");
-    } catch (error) {
-      console.log(error);
-    }
-  });
+  })
+  .then(response => response.json())
+  .then(data => {
+    window.location.href = `confirmation.html?id=${data.orderId}`;
+    localStorage.removeItem("produitsPanier");
+  })
+  .catch(error => console.log(error));
 });
 
 // GESTION DES MODIFICATIONS DU PANIER
