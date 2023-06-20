@@ -31,7 +31,7 @@ const product = fetch(`http://localhost:3000/api/products/${id}`)
             containerName.appendChild(productName);
 
             // Création du contenaire prix
-            const productPrice = document.createElement("p");
+            const productPrice = document.createElement("span");
             productPrice.innerText = data.price;
             const containerPrice = document.getElementById("price");
             containerPrice.appendChild(productPrice);
@@ -66,7 +66,7 @@ const product = fetch(`http://localhost:3000/api/products/${id}`)
                     nomProduit: data.name,
                     imageProduit: data.imageUrl,
                     altProduit: data.altTxt,
-             //     prixProduit: data.price,
+             //     prixProduit: data.price, !! retirer du localstorage
                     quantite_Produit: parseInt(document.getElementById("quantity").value), 
                     couleur_Produit: document.getElementById("colors").value,
                 };
