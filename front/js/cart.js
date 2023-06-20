@@ -19,14 +19,14 @@ if (isCartEmpty) {
   for (let i = 0; i < productCart.length; i += 1) {
     // Récupérer le prix à partir de l'API
     fetch(`http://localhost:3000/api/products/${productCart[i].id_Produit}`)
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         const prixProduit = data.price;
         const prixTotal = prixProduit * productCart[i].quantite_Produit;
         productCart[i].prixTotal = prixTotal;
 
-        document.querySelector("#cart__items").innerHTML +=
-          `<article class="cart__item" data-id="${productCart[i].id_Produit}">
+        document.querySelector("#cart__items").innerHTML += `
+          <article class="cart__item" data-id="${productCart[i].id_Produit}">
             <div class="cart__item__img">
               <img src="${productCart[i].imageProduit}" alt="${productCart[i].altProduit}">
             </div>
@@ -41,12 +41,12 @@ if (isCartEmpty) {
                   <p>Qté : </p>
                   <input type="number" class="itemQuantity" name="itemQuantity" min="0" max="100" canapeId="${productCart[i].id_Produit}" canapeColor="${productCart[i].couleur_Produit}" value="${productCart[i].quantite_Produit}">
                 </div>
-              <div class="cart__item__content__settings__delete">
-                <p class="deleteItem" canapeId="${productCart[i].id_Produit}" canapeColor="${productCart[i].couleur_Produit}">Supprimer</p>
+                <div class="cart__item__content__settings__delete">
+                  <p class="deleteItem" canapeId="${productCart[i].id_Produit}" canapeColor="${productCart[i].couleur_Produit}">Supprimer</p>
+                </div>
               </div>
             </div>
-          </div>
-        </article>`;
+          </article>`;
 
         // VARIABLES POUR CHANGER LE TYPE EN NOMBRE
         let quantityNumber = parseInt(productCart[i].quantite_Produit);
@@ -64,35 +64,25 @@ if (isCartEmpty) {
         document.querySelector("#totalQuantity").innerHTML = totalQuantityResult;
         document.querySelector("#totalPrice").innerHTML = totalPriceResult;
       })
-      .catch(error => console.log(error));
+      .catch((error) => console.log(error));
   }
 }
 
 // GERER LES INTERACTIONS AVEC LE FORMULAIRE A REMPLIR
-let patternFirstName = document.querySelector("#firstName");
-patternFirstName.setAttribute("pattern", "^[A-Za-zÀ-ÿ\\s-]+$");
-
-let patternLastName = document.querySelector("#lastName");
-patternLastName.setAttribute("pattern", "^[A-Za-zÀ-ÿ\\s-]+$");
-
-let patternAddress = document.querySelector("#address");
-patternAddress.setAttribute("pattern", "^[A-Za-z0-9]+([\\s-][A-Za-z0-9]+)*$");
-
-let patternCity = document.querySelector("#city");
-patternCity.setAttribute("pattern", "^[A-Za-zÀ-ÿ-]+$");
-
-let patternEmail = document.querySelector("#email");
-patternEmail.setAttribute(
-  "pattern",
-  "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-);
+const patterns = {
+  firstName: /^[A-Za-zÀ-ÿ\s-]+$/,
+  lastName: /^[A-Za-zÀ-ÿ\s-]+$/,
+  address: /^[A-Za-z0-9]+([-\s][A-Za-z0-9]+)*$/,
+  city: /^[A-Za-zÀ-ÿ-]+$/,
+  email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+};
 
 const errorMessages = {
   firstName: "Le champ Prénom n'est pas valide.",
   lastName: "Le champ Nom n'est pas valide.",
   address: "Le champ Adresse n'est pas valide.",
   city: "Le champ Ville n'est pas valide.",
-  email: "Le champ Email n'est pas valide."
+  email: "Le champ Email n'est pas valide.",
 };
 
 const showAlert = (inputId) => {
@@ -108,10 +98,9 @@ const clearErrorMessage = (inputId) => {
 
 const validateInput = (input) => {
   const inputId = input.id;
-  const regexPattern = input.getAttribute("pattern");
-  const regex = new RegExp(`^${regexPattern}$`);
+  const pattern = patterns[inputId];
 
-  if (!regex.test(input.value)) {
+  if (!pattern.test(input.value)) {
     showAlert(inputId);
   } else {
     clearErrorMessage(inputId);
@@ -127,19 +116,17 @@ for (let input of formInputs) {
 
 const isFormValid = () => {
   const formInputs = document.querySelectorAll(".cart__order__form__question input");
-  let formValid = true;
 
   for (let input of formInputs) {
-    const regexPattern = input.getAttribute("pattern");
-    const regex = new RegExp(`^${regexPattern}$`);
+    const inputId = input.id;
+    const pattern = patterns[inputId];
 
-    if (!regex.test(input.value)) {
-      formValid = false;
-      break;
+    if (!pattern.test(input.value)) {
+      return false;
     }
   }
 
-  return formValid;
+  return true;
 };
 
 document.querySelector(".cart__order__form__submit").addEventListener("click", function (e) {
@@ -172,17 +159,17 @@ document.querySelector(".cart__order__form__submit").addEventListener("click", f
       products: getId,
     }),
   })
-  .then(response => response.json())
-  .then(data => {
-    window.location.href = `confirmation.html?id=${data.orderId}`;
-    localStorage.removeItem("produitsPanier");
-  })
-  .catch(error => console.log(error));
+    .then((response) => response.json())
+    .then((data) => {
+      window.location.href = `confirmation.html?id=${data.orderId}`;
+      localStorage.removeItem("produitsPanier");
+    })
+    .catch((error) => console.log(error));
 });
 
 // GESTION DES MODIFICATIONS DU PANIER
-document.addEventListener('change', function (e) {
-  if (e.target && e.target.className == 'itemQuantity') {
+document.addEventListener("change", function (e) {
+  if (e.target && e.target.className == "itemQuantity") {
     const canapeId = e.target.getAttribute("canapeId");
     const canapeColor = e.target.getAttribute("canapeColor");
     let newQuantity = parseInt(e.target.value);
@@ -217,8 +204,8 @@ document.addEventListener('change', function (e) {
 
         // Mettre à jour le prix dans le localStorage
         fetch(`http://localhost:3000/api/products/${productCart[i].id_Produit}`)
-          .then(response => response.json())
-          .then(data => {
+          .then((response) => response.json())
+          .then((data) => {
             const prixProduit = data.price;
             const prixTotal = prixProduit * newQuantity;
             productCart[i].prixTotal = prixTotal;
@@ -229,7 +216,7 @@ document.addEventListener('change', function (e) {
             // Rafraîchir la page
             location.reload();
           })
-          .catch(error => console.log(error));
+          .catch((error) => console.log(error));
 
         break;
       }
@@ -238,8 +225,8 @@ document.addEventListener('change', function (e) {
 });
 
 // GESTION DE LA SUPPRESSION DU PRODUIT
-document.addEventListener('click', function (e) {
-  if (e.target && e.target.className == 'deleteItem') {
+document.addEventListener("click", function (e) {
+  if (e.target && e.target.className == "deleteItem") {
     const canapeId = e.target.getAttribute("canapeId");
     const canapeColor = e.target.getAttribute("canapeColor");
 
