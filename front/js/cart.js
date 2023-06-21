@@ -161,8 +161,8 @@ document.querySelector(".cart__order__form__submit").addEventListener("click", f
   })
     .then((response) => response.json())
     .then((data) => {
-      window.location.href = `confirmation.html?id=${data.orderId}`;
       localStorage.removeItem("produitsPanier");
+      window.location.href = `confirmation.html?id=${data.orderId}`; 
     })
     .catch((error) => console.log(error));
 });
