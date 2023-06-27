@@ -70,6 +70,10 @@ const product = fetch(`http://localhost:3000/api/products/${id}`)
                     quantite_Produit: parseInt(document.getElementById("quantity").value), 
                     couleur_Produit: document.getElementById("colors").value,
                 };
+                if (optionProduit.couleur_Produit === '') {
+                    alert("Une couleur doit être selectionné");
+                    return;
+                }
 
                 // Validation de la quantité
                 if (optionProduit.quantite_Produit <= 0) {
